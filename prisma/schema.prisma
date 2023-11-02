@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model tb_item {
+  id           Int        @id @default(autoincrement())
+  name         String     @map("item_name") @db.VarChar(45)
+  price        Decimal    @map("item_price") @db.Decimal(10, 2)
+  UOM          String     @map("item_uom") @db.VarChar(10)
+  qtyPerUOM    Int        @map("item_qty_per_uom")
+  stockBalance Int        @map("item_stock")
+  tb_order     tb_order[]
+}
+
+model tb_order {
+  id            Int     @id @default(autoincrement())
+  itemId        Int     @map("item_id")
+  orderQty      Int     @map("order_qty")
+  orderUom      String  @map("order_uom") @db.VarChar(10)
+  orderQtyPerUOM Int     @map("order_qty_per_uom")
+  orderPrice    Decimal @map("order_price") @db.Decimal(10, 2)
+  totalPrice    Decimal @map("order_total_price") @db.Decimal(10, 2)
+  item          tb_item @relation(fields: [itemId], references: [id])
+
+  @@index([itemId], map: "tb_order_item_id_fkey")
+}
